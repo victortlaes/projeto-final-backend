@@ -1,0 +1,9 @@
+{
+  "production": {
+    "username": "root",
+    "password": "tlaes383",
+    "database": "projeto-final-backend",
+    "host": "127.0.0.1",
+    "dialect": "mysql"
+  }
+}
