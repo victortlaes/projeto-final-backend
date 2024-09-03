@@ -1,45 +1,51 @@
 const express = require('express');
-const app = express();
-const { Sequelize } = require('sequelize');
-const mustacheExpress = require('mustache-express');
 const path = require('path');
+const mustacheExpress = require('mustache-express');
+const session = require('express-session');
+const passport = require('passport');
+const flash = require('connect-flash');
+const app = express();
 const userRoutes = require('./routes/user');
-const PORT = 3000;
+require('./config/passport-config')(passport);  
+const { sequelize } = require('./models');
 
-//Chamando mustache na pasta views
-app.engine('mustache', mustacheExpress());
-app.set('view engine', 'mustache');
-app.set('views', path.join(__dirname, 'views'));
+
+app.use(express.static(path.join(__dirname, 'public')));
+
 
 app.use(express.json());
-
-// Rotas de usuário
-app.use('/api', userRoutes);
+app.use(express.urlencoded({ extended: false }));
 
 
-// Conectando com o banco de dados
-const sequelize = new Sequelize('projetobackend', 'root', 'tlaes383', {
-  host: 'localhost',
-  dialect: 'mysql'
-});
+app.use(session({
+  secret: 'senhasecreta',
+  resave: false,
+  saveUninitialized: false,
+  cookie: { secure: false }
+}));
 
-// Conexao Sequelize
-sequelize.authenticate()
-  .then(() => console.log('Conectou com o banco de dados'))
-  .catch(err => console.error('Não conectou ao banco de dados', err));
 
-sequelize.sync();
+app.use(passport.initialize());
+app.use(passport.session());
+app.use(flash());
 
+ 
+// Rotas
+app.use('/', userRoutes);
+
+//pagina inicial
 app.get('/', (req, res) => {
-  res.send('API funcionando!');
+  res.render('index', {
+    isAdmin: req.user.isAdmin,
+    user: req.user.username
+  });
 });
 
-app.get('/login', (req, res) => {
-  res.render('login', { title: 'Login' });
-});
-
-
-// Servidor rodando
-app.listen(PORT, () => {
-  console.log(`Servidor rodando na porta ${PORT}`);
+// Sincroniza o banco de dados e inicia o servidor
+sequelize.sync().then(() => {
+  app.listen(3000, () => {
+    console.log(`Servidor rodando na porta ${3000}`);
+  });
+}).catch(error => {
+  console.error('Erro ao sincronizar o banco de dados:', error);
 });
