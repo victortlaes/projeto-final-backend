@@ -43,7 +43,7 @@ app.get('/', (req, res) => {
   });
 });
 
-// Sincroniza o banco de dados e inicia o servidor
+//sincroniza o banco de dados e inicia o servidor
 sequelize.sync().then(() => {
   app.listen(3000, () => {
     console.log(`Servidor rodando na porta ${3000}`);

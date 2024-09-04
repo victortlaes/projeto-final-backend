@@ -1,6 +1,5 @@
 const { Sequelize, DataTypes } = require('sequelize');
 
-// Conectando ao MySQL sem especificar um banco de dados
 const sequelize = new Sequelize('mysql://root:tlaes383@localhost:3306');
 
 const createDatabaseAndTable = async () => {
@@ -9,13 +8,13 @@ const createDatabaseAndTable = async () => {
     await sequelize.query('CREATE DATABASE IF NOT EXISTS `projeto-final-backend`');
     console.log('Banco de dados criado com sucesso.');
 
-    // Reconfigura o Sequelize para usar o banco de dados criado
+    // sequelize usa o banco de dados criado
     const sequelizeWithDB = new Sequelize('projeto-final-backend', 'root', 'tlaes383', {
       host: '127.0.0.1',
       dialect: 'mysql'
     });
 
-    // Tabela users
+
     const Users = sequelizeWithDB.define('Users', {
       username: {
         type: DataTypes.STRING,
@@ -42,7 +41,7 @@ const createDatabaseAndTable = async () => {
       timestamps: false
     });
 
-    // Cria a tabela se não existir
+    //cria a tabela se não existir
     await Users.sync({force:true});
     console.log('Tabela `users` criada com sucesso.');
 
