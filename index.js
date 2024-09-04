@@ -6,6 +6,7 @@ const passport = require('passport');
 const flash = require('connect-flash');
 const app = express();
 const userRoutes = require('./routes/user');
+const crudRoutes = require('./routes/crud');
 require('./config/passport-config')(passport);  
 const { sequelize } = require('./models');
 
@@ -32,6 +33,7 @@ app.use(flash());
  
 // Rotas
 app.use('/', userRoutes);
+app.use('/', crudRoutes);
 
 //pagina inicial
 app.get('/', (req, res) => {
