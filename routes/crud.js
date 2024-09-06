@@ -13,8 +13,8 @@ router.get('/liga', async (req, res) => {
 });
 
 router.post('/liga', async (req, res) => {
-  const { pais } = req.body;
-  const novaLiga = await Liga.create({ pais });
+  const { nome, pais } = req.body;
+  const novaLiga = await Liga.create({ nome, pais });
   res.json(novaLiga);
 });
 
@@ -116,6 +116,31 @@ router.delete('/jogadores/:id', async (req, res) => {
     res.json({ message: 'Jogador deletado' });
   } else {
     res.status(404).json({ error: 'Jogador não encontrado' });
+  }
+});
+
+//ROTA ESPECIAL
+router.get('/jogadorestime', async (req, res) => {
+  try {
+    const jogadoresPorTime = await Time.findAll({
+      include: {
+        model: Jogadores,
+        as: 'jogadores',
+        attributes: ['nome','idade'],
+        order: [['jogadores','idade', 'ASC']]
+      },
+      attributes: ['nome']
+    });
+
+    const resultado = jogadoresPorTime.map(time => ({
+      nome: time.nome,
+      //funcao para sortear a ordem dos jogadores
+      jogadores: time.jogadores.sort((a, b) => a.idade - b.idade)
+    }));
+
+    res.json(resultado);
+  } catch (error) {
+    res.status(500).json({ error: 'Erro ao buscar jogadores' });
   }
 });
 

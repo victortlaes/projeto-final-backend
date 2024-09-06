@@ -30,5 +30,10 @@ module.exports = (sequelize) => {
     },
   });
 
+  Time.associate = (models) => {
+    Time.hasMany(models.Jogadores, { foreignKey: 'timeId', as: 'jogadores' });
+    models.Jogadores.belongsTo(Time, { foreignKey: 'timeId', as: 'time' });
+  };
+
   return Time;
 };

@@ -40,7 +40,7 @@ router.post('/login', (req, res, next) => {
       return res.status(500).json({ error: 'Erro de autenticação' });
     }
     if (!user) {
-      return res.status(401).json({ error: 'Credenciais inválidas' });
+      return res.status(401).json({ error: 'User ou senha incorreta' });
     }
     req.logIn(user, (err) => {
       if (err) {
