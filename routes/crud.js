@@ -1,7 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const { Liga, Time, Jogadores } = require('../models');
-const ensureAuthenticated = require('../middleware/auth')
+const ensureAuthenticated = require('../middleware/auth');
+
 
 //middleware
 router.use(ensureAuthenticated);
@@ -139,6 +140,66 @@ router.get('/jogadorestime', async (req, res) => {
     }));
 
     res.json(resultado);
+  } catch (error) {
+    res.status(500).json({ error: 'Erro ao buscar jogadores' });
+  }
+});
+
+
+router.get('/jogadorestime/:idtime/:idtime2', async (req, res) => {
+  const { idtime, idtime2} = req.params; 
+  //const { Op } = require('sequelize');
+
+  try {
+    const jogadoresPorTime = await Time.findAll({
+      where: {id: idtime },
+        //{
+          //[Op.or]: [idtime, idtime2],
+        //},
+      
+      // Sequelize.or( { id: [idtime,idtime2] }), 
+      //,{ id: idtime, idtime2}, 
+      include: [{
+        model: Jogadores,
+        as: 'jogadores',
+        attributes: ['nome'],
+      }],
+      attributes: ['nome'],
+     // raw:true,
+      });
+
+
+      
+
+    const jogadoresPorTime2 = await Time.findAll({
+      where: {id: idtime2 }, 
+      include: {
+        model: Jogadores,
+        as: 'jogadores',
+        attributes: ['nome'],
+       },
+       attributes: ['nome'],
+       });
+
+
+     // var total = {jogadoresPorTime,jogadoresPorTime2}
+
+      const resultado = jogadoresPorTime.map(time => ({
+        nome: time.nome,
+       jogadores: time.jogadores.sort((a, b) => a.nome.localeCompare(b.nome)
+      ),}))
+      //(a, b) => a.firstname.localeCompare(b.firstname)
+
+
+      const resultado2 = jogadoresPorTime2.map(time => ({
+        nome: time.nome,
+        jogadores: time.jogadores.sort((a, b) => a.nome.localeCompare(b.nome)
+      ),}))
+
+      var total = {resultado, resultado2}
+
+       res.json(total);
+   
   } catch (error) {
     res.status(500).json({ error: 'Erro ao buscar jogadores' });
   }
